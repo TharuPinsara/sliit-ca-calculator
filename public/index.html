@@ -26,6 +26,7 @@
 html{scroll-behavior:smooth;scroll-padding-top:16px}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
 
+/* Slide-up Animation */
 @keyframes slideUp {
   0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -269,6 +270,7 @@ const getMod=k=>k==="draft"?S.draft:(P.find(m=>m.id==k)||S.custom.find(m=>m.id==
 const items=m=>m.pre?m.items.map((it,i)=>({...it,m:(S.marks[m.id]||{})[i]??""})):m.items;
 const dashMods=()=>[...P,...S.custom.map(c=>({...c,pre:false}))].filter(m=>m.y==S.year&&m.s==S.sem);
 
+// Global click listener to close custom dropdown
 document.addEventListener('click', e => {
   if(!e.target.closest('.dd-wrap')) {
     const m = document.getElementById('dd-menu');
@@ -301,10 +303,10 @@ function chooseSemester(n){S.sem=n;S.view="modules";save();render()}
 function backTo(v){S.view=v;save();render()}
 function startCustom(){S.draft=newDraft();S.draft.y=S.year;S.draft.s=S.sem;S.cur="draft";S.view="calc";save();render()}
 function wizardSteps(active){return `<div class="steps"><span class="step">1 · Faculty</span><span class="step ${active==='year'?'active':''}">2 · Year</span><span class="step ${active==='semester'?'active':''}">3 · Semester</span><span class="step ${active==='modules'?'active':''}">4 · Module</span></div>`}
-function vHome(){return `<section class="welcome"><h2>Welcome to your CA planner</h2><p class="intro">Choose your faculty to get started. You can add your own modules if your course is not listed.</p><div class="choice-grid"><button class="choice" onclick="chooseFaculty('computing')"><span class="symbol">⌘</span><strong>Faculty of Computing</strong><small>Browse the available Computing modules and assessment details.</small></button><button class="choice" onclick="chooseFaculty('other')"><span class="symbol">✦</span><strong>Other Faculties</strong><small>Create your own modules and assessment weights.</small></button></div></section>`}
+function vHome(){return `<section class="welcome"><h2>Choose your faculty</h2><p class="intro">Welcome to your CA planner</p><div class="choice-grid"><button class="choice" onclick="chooseFaculty('computing')"><span class="symbol">⌘</span><strong>Faculty of Computing</strong></button><button class="choice" onclick="chooseFaculty('other')"><span class="symbol">✦</span><strong>Other Faculties</strong></button></div></section>`}
 function vYear(){return `<section class="welcome">${wizardSteps('year')}<div class="backline"><button class="btn" onclick="backTo('home')">← Back</button></div><h2>Which year are you in?</h2><p class="intro">${S.faculty==='computing'?'Faculty of Computing':'Other Faculties'} · Select your academic year.</p><div class="choice-grid year-grid">${[1,2,3,4].map(y=>`<button class="choice" onclick="chooseYear(${y})"><span class="symbol">${y}</span><strong>Year ${y}</strong></button>`).join('')}</div></section>`}
 function vSemester(){return `<section class="welcome">${wizardSteps('semester')}<div class="backline"><button class="btn" onclick="backTo('year')">← Back</button></div><h2>Choose your semester</h2><p class="intro">Year ${S.year} · Select the semester you want to view.</p><div class="choice-grid">${[1,2].map(n=>`<button class="choice" onclick="chooseSemester(${n})"><span class="symbol">S${n}</span><strong>Semester ${n}</strong><small>Browse your semester modules</small></button>`).join('')}</div></section>`}
-function vModules(){const list=[...P,...S.custom].filter(m=>m.y==S.year&&m.s==S.sem);return `<section class="welcome">${wizardSteps('modules')}<div class="backline"><button class="btn" onclick="backTo('semester')">← Back</button></div><h2>Choose your module</h2><p class="intro">${S.faculty==='computing'?'Faculty of Computing':'Other Faculties'} · Year ${S.year}, Semester ${S.sem}</p><div class="choice-grid">${list.map(m=>`<button class="choice" onclick="go('calc','${m.id}')"><span class="module-title">${m.code?`<span class="module-code">${esc(m.code)}</span>`:""}<strong>${esc(m.name)}</strong></span><small>${m.items.length} assessment components</small></button>`).join('')}<button class="choice" onclick="startCustom()"><span class="symbol">＋</span><strong>Add a module</strong><small>Can't find your module? Create your own assessment list.</small></button></div>${list.length?'':'<p class="sub">No preset modules are listed for this semester yet. Add your module to continue.</p>'}</section>`}
+function vModules(){const list=[...P,...S.custom].filter(m=>m.y==S.year&&m.s==S.sem);return `<section class="welcome">${wizardSteps('modules')}<div class="backline"><button class="btn" onclick="backTo('semester')">← Back</button></div><h2>Choose your module</h2><p class="intro">${S.faculty==='computing'?'Faculty of Computing':'Other Faculties'} · Year ${S.year}, Semester ${S.sem}</p><div class="choice-grid">${list.map(m=>`<button class="choice" onclick="go('calc','${m.id}')"><span class="module-title">${m.code?`<span class="module-code">${esc(m.code)}</span>`:""}<strong>${esc(m.name)}</strong></span></button>`).join('')}<button class="choice" onclick="startCustom()"><span class="symbol">＋</span><strong>Add a module</strong><small>Can't find your module? Create your own assessment list.</small></button></div>${list.length?'':'<p class="sub">No preset modules are listed for this semester yet. Add your module to continue.</p>'}</section>`}
 
 function buildDropdown(m) {
   const title = S.cur === "draft" ? "＋ Add a new custom module..." : esc(m.code ? m.code + " - " + (m.name || "Untitled") : (m.name || "Untitled"));
@@ -344,8 +346,7 @@ function vCalc(){
  const m=getMod(S.cur),ed=!m.pre,isDraft=m.id==="draft";
  
  return`<div class="card"><label>Choose a module</label>
- ${buildDropdown(m)}
- <div class="sub" style="margin-top:12px">Enter a module name, its assessment weights and your marks. The final examination weight is calculated automatically.</div></div>
+ ${buildDropdown(m)}</div>
  <div class="card">
  ${ed?`<div class="f"><div style="grid-column:1/-1"><label>Module name</label><input type="text" value="${esc(m.name)}" placeholder="e.g. Web Technologies" oninput="meta('name',this.value)"></div>
  <div><label>Academic year</label><select onchange="meta('y',+this.value)">${[1,2,3,4].map(y=>`<option value="${y}" ${m.y==y?"selected":""}>Year ${y}</option>`).join("")}</select></div>
@@ -431,9 +432,7 @@ function vDash(){
  <select onchange="S.sem=+this.value;save();render()" aria-label="Semester">${[1,2].map(y=>`<option value="${y}" ${S.sem==y?"selected":""}>Semester ${y}</option>`).join("")}</select></div>
  <div class="stats"><div class="card"><b>Year ${S.year}, Sem ${S.sem}</b><span class="sub">Selected period</span></div>
  <div class="card"><b>${ms.length}</b><span class="sub">Total modules</span></div>
- <div class="card"><b>${en.length}</b><span class="sub">Modules with marks entered</span></div>
- <div class="card"><b>${ap==null?"–":f2(ap)+" / 100"}</b><span class="sub">Average CA performance</span></div>
- <div class="card"><b>${ac==null?"–":f2(ac)+" / "+f2(aw)}</b><span class="sub">Average CA contribution (out of average CA weight)</span></div></div>
+ <div class="card"><b>${en.length}</b><span class="sub">Modules with marks entered</span></div></div>
  ${ms.length?`<div class="grid">${ms.map((m,i)=>{const c=cs[i];return`<div class="card mod s-${c.status}" tabindex="0" onclick="go('calc','${m.id}')" onkeydown="if(event.key==='Enter')go('calc','${m.id}')">
  <div class="row"><span class="sub">Year ${m.y} · Semester ${m.s}</span>${badge(c.status)}</div><b style="font-size:17px;display:block;margin-top:4px">${esc(m.name)}</b>
  <div class="row" style="margin-top:12px"><span class="sub">CA performance</span><b style="font-weight:700">${c.perf==null?"–":f2(c.perf)+" / 100"}</b></div>
