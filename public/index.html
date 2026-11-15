@@ -269,7 +269,6 @@ const getMod=k=>k==="draft"?S.draft:(P.find(m=>m.id==k)||S.custom.find(m=>m.id==
 const items=m=>m.pre?m.items.map((it,i)=>({...it,m:(S.marks[m.id]||{})[i]??""})):m.items;
 const dashMods=()=>[...P,...S.custom.map(c=>({...c,pre:false}))].filter(m=>m.y==S.year&&m.s==S.sem);
 
-// Global click listener to close custom dropdown
 document.addEventListener('click', e => {
   if(!e.target.closest('.dd-wrap')) {
     const m = document.getElementById('dd-menu');
