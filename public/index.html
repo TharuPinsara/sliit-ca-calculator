@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SLIIT CA Marks Calculator</title>
+<meta name="theme-color" content="#6366f1">
+<meta name="description" content="A simple SLIIT continuous assessment marks calculator and final exam grade planner.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23grad)'/%3E%3Ctext x='50' y='68' font-family='sans-serif' font-size='52' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3EA%2B%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+ --bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;
+ --hd:#0f172a;--ac:#6366f1;--ac2:#e0e7ff;--warn:#d97706;--warnbg:#fef3c7;
+ --bad:#e11d48;--badbg:#ffe4e6;--ok:#16a34a;--okbg:#dcfce7;
+ color-scheme:light;
+}
+:root[data-theme="dark"]{
+ --bg:#0f172a;--card:#1e293b;--ink:#f8fafc;--mut:#94a3b8;--line:#334155;
+ --hd:#f1f5f9;--ac:#818cf8;--ac2:#312e81;--warn:#fbbf24;--warnbg:#78350f;
+ --bad:#fb7185;--badbg:#881337;--ok:#4ade80;--okbg:#14532d;
+ color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+/* Slide-up Animation */
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.card, .choice, .kpi, .stats .card, .welcome {
+  animation: slideUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.card:nth-child(1), .choice:nth-child(1) { animation-delay: 0.0s; }
+.card:nth-child(2), .choice:nth-child(2) { animation-delay: 0.06s; }
+.card:nth-child(3), .choice:nth-child(3) { animation-delay: 0.12s; }
+.card:nth-child(4), .choice:nth-child(4) { animation-delay: 0.18s; }
+.card:nth-child(5) { animation-delay: 0.24s; }
+
+.top{color:#fff;padding:34px 20px 0;background:radial-gradient(circle at 85% 0%,#a855f7 0,transparent 45%),radial-gradient(circle at 10% 100%,#3b82f6 0,transparent 40%),linear-gradient(135deg,#0f172a,#1e1b4b 70%);}
+.in,.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{margin:0;letter-spacing:-.025em}
+h1{font-size:clamp(25px,4vw,34px);font-weight:800;line-height:1.2}
+.top p{margin:8px 0 22px;color:#cbd5e1;font-size:14px}
+nav{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
+nav button{border:0;border-bottom:3px solid transparent;background:transparent;color:#94a3b8;padding:12px 17px 13px;font:inherit;font-weight:650;cursor:pointer;white-space:nowrap;border-radius:10px 10px 0 0;transition:all .2s;}
+nav button.on{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,0.1)}
+nav button:hover:not(.on){color:#fff;background:rgba(255,255,255,0.05)}
+.wrap{padding:26px 20px 56px}
+h2{font-size:21px;font-weight:780;margin-bottom:12px}
+h3{font-size:16px;font-weight:750;margin:22px 0 10px}
+.sub{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;margin-bottom:17px;box-shadow:0 8px 24px rgba(0,0,0,0.04);transition:transform 0.2s;}
+
+/* Base input styling */
+select,input,button{font:inherit;color:var(--ink)}
+input[type=text],input[type=number]{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;min-width:0;transition:all .2s}
+input:focus,button:focus-visible{outline:0;border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 15%,transparent);transform:translateY(-1px);}
+
+/* Secondary OS Selects (used in dashboard/settings) */
+select {
+  appearance: none; -webkit-appearance: none;
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 42px 12px 14px; width: 100%; min-width: 0;
+  cursor: pointer; font-weight: 600; transition: all .2s;
+}
+:root[data-theme="dark"] select { background-image: url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
+select:hover { border-color: var(--ac); }
+select:focus { outline: 0; border-color: var(--ac); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ac) 15%, transparent); }
+
+/* Custom Custom Dropdown Component for Module Picker */
+.dd-wrap { position: relative; width: 100%; z-index: 50; }
+.dd-trig {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 16px; padding: 14px 16px;
+  background-color: var(--ac2); color: var(--ac); font-weight: 650;
+  border-radius: 14px; cursor: pointer; transition: all .2s;
+  user-select: none; border: 2px solid transparent;
+}
+.dd-trig:hover { background-color: color-mix(in srgb, var(--ac2) 80%, var(--card)); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.dd-trig.open { border-color: var(--ac); background-color: var(--bg); color: var(--ink); transform: translateY(0); box-shadow: none; }
+.dd-trig svg { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); color: var(--ac); }
+.dd-trig.open svg { transform: rotate(180deg); color: var(--mut); }
+.dd-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  max-height: 50vh; overflow-y: auto; z-index: 100;
+  opacity: 0; pointer-events: none; transform: translateY(-10px) scale(0.98);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: top center;
+  scrollbar-width: thin; scrollbar-color: var(--mut) var(--bg);
+}
+.dd-menu.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+.dd-group { 
+  padding: 12px 16px 6px; font-size: 11px; font-weight: 800; color: var(--mut); 
+  text-transform: uppercase; letter-spacing: .05em; background: color-mix(in srgb, var(--bg) 95%, var(--card)); 
+  position: sticky; top: 0; z-index: 2; border-bottom: 1px solid var(--line);
+}
+.dd-group:not(:first-child) { border-top: 1px solid var(--line); }
+.dd-opt {
+  padding: 12px 16px; cursor: pointer; font-size: 14px; color: var(--ink);
+  transition: all 0.15s; display: flex; align-items: center; border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+.dd-opt:hover { background: color-mix(in srgb, var(--ac2) 30%, transparent); color: var(--ac); padding-left: 22px; }
+.dd-opt.sel { background: color-mix(in srgb, var(--ac2) 50%, transparent); color: var(--ac); font-weight: 700; border-left: 4px solid var(--ac); padding-left: 12px; }
+.dd-opt.sel:hover { padding-left: 16px; }
+.dd-add { color: var(--ac); font-weight: 700; position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); border-bottom: none; z-index: 2; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); }
+.dd-add:hover { background: color-mix(in srgb, var(--ac2) 50%, var(--card)); padding-left: 16px; }
+
+label{display:block;font-size:12px;font-weight:750;color:var(--mut);margin:0 0 8px;text-transform:uppercase;letter-spacing:.055em}
+.f{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:8px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 16px;cursor:pointer;font-weight:700;transition:all .2s}
+.btn:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+.btn:active{transform:translateY(0) scale(0.98);}
+.btn.pri{background:linear-gradient(135deg,var(--ac),#8b5cf6);border:none;color:#fff;box-shadow:0 4px 15px color-mix(in srgb,var(--ac) 40%,transparent)}
+.btn.pri:hover{box-shadow:0 6px 20px color-mix(in srgb,var(--ac) 50%,transparent);transform:translateY(-2px) scale(1.02);}
+.btn.dng{color:var(--bad)}
+.btn.alt{background:var(--ac2);color:var(--ac);border-color:transparent;}
+.btn.alt:hover{background:color-mix(in srgb, var(--ac2) 80%, var(--card));}
+
+.acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px;align-items:center;}
+.tw{width:100%;max-width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:510px;background:var(--card)}
+th,td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:middle;transition:background 0.15s;}
+tr:hover td:not(.sub) {background:color-mix(in srgb, var(--ac2) 30%, transparent);}
+th{font-size:11px;color:var(--mut);font-weight:800;text-transform:uppercase;letter-spacing:.055em;background:var(--bg)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td input{text-align:right}td input[type=text]{text-align:left}
+td.n input{max-width:130px;margin-left:auto}
+input.bad{border-color:var(--bad);background:var(--badbg)}
+tr.fin td{background:color-mix(in srgb, var(--ac2) 60%, transparent);font-weight:750}
+.alert{padding:12px 16px;border-radius:12px;margin:12px 0;font-size:14px;border:1px solid transparent;font-weight:500;}
+.a-warn{background:var(--warnbg);color:var(--warn);border-color:color-mix(in srgb, var(--warn) 20%, transparent)}
+.a-bad{background:var(--badbg);color:var(--bad);border-color:color-mix(in srgb, var(--bad) 20%, transparent)}
+.a-ok{background:var(--okbg);color:var(--ok);border-color:color-mix(in srgb, var(--ok) 20%, transparent)}
+.kp{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin:14px 0}
+.kpi{border:1px solid var(--line);border-radius:16px;padding:20px;background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--ac2) 40%,var(--card)))}
+.kpi b{display:block;font-size:28px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ac)}
+.kpi span{font-size:13px;color:var(--mut);display:block;margin-top:4px;font-weight:500;}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.mod{cursor:pointer;margin:0;border-width:2px;border-color:transparent;}
+.mod:hover{border-color:var(--ac);transform:translateY(-4px)}
+.mod.s-part{border-top-color:#e4ad43}.mod.s-full{border-top-color:#35ae79}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.b-none{background:var(--line);color:var(--mut)}.b-part{background:var(--warnbg);color:var(--warn)}.b-full{background:var(--okbg);color:var(--ok)}.b-bad{background:var(--badbg);color:var(--bad)}
+.bar{height:8px;background:var(--line);border-radius:20px;overflow:hidden;margin:12px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),#a855f7);border-radius:20px;transition:width 0.5s ease-out;}
+.stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:16px}
+.stats .card{margin:0;padding:20px}.stats b{display:block;font-size:24px;font-weight:800;letter-spacing:-.03em}
+.empty{text-align:center;color:var(--mut);padding:40px}
+.sel{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.sel select{width:auto;min-width:145px;cursor:pointer;}
+
+@media(max-width:600px){
+  .top{padding:25px 16px 0}.wrap{padding:18px 13px 40px}.card{padding:16px;border-radius:16px}nav button{padding:10px 12px}.kp{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:16px}.kpi b{font-size:22px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.f{grid-template-columns:1fr 1fr}
+  .wrap{min-width:0;overflow-x:hidden}
+  .card{min-width:0;max-width:100%}
+  .tw{overflow-x:auto;overscroll-behavior-x:contain}
+  .tw table{min-width:0;width:100%;table-layout:fixed}
+  .tw th,.tw td{padding:10px 8px;font-size:13px;overflow-wrap:anywhere;word-break:normal}
+  .tw th{font-size:10px;letter-spacing:0;text-transform:none}
+  .tw td input,.tw td input[type=text],.tw td input[type=number]{width:100%;min-width:0;max-width:100%;padding:10px 8px;font-size:13px;border-radius:8px}
+  .tw td.n input{margin:0;max-width:100%}
+  .tw td.n,.tw th.n{text-align:center}
+  .tw td:last-child .btn{padding:8px;font-size:11px;white-space:normal}
+  .acts{gap:7px}.acts .btn{flex:1 1 auto}
+  .sel{gap:8px}.sel select{flex:1;min-width:0;width:0}
+  select { padding: 10px 38px 10px 12px; }
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important;animation:none!important;}}
+
+.welcome{max-width:850px;margin:24px auto 0;text-align:center}.welcome h2{font-size:clamp(24px,4vw,32px);margin-bottom:8px}
+.welcome .intro{color:var(--mut);margin:0 auto 24px;max-width:560px}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:760px;margin:22px auto}
+.choice-grid.year-grid{grid-template-columns:repeat(2,minmax(0,220px));justify-content:center;max-width:500px}
+.choice-grid.year-grid .choice{align-items:center;text-align:center;justify-content:center;min-height:140px}
+@media(max-width:600px){.choice-grid.year-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:420px}}
+.choice{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:24px;background:var(--card);border:1px solid var(--line);border-radius:20px;cursor:pointer;color:var(--ink);text-align:left;box-shadow:0 8px 24px rgba(0,0,0,0.03);transition:all .2s;}
+.choice:hover{border-color:var(--ac);transform:translateY(-4px);box-shadow:0 12px 32px rgba(99,102,241,0.12)}
+.choice .symbol{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--ac2),color-mix(in srgb,var(--ac) 15%,var(--card)));color:var(--ac);font-size:24px;box-shadow:inset 0 2px 4px rgba(255,255,255,0.5)}
+.choice strong{font-size:18px;font-weight:700;}
+.choice small{font-size:13px;color:var(--mut);line-height:1.5}
+.module-code{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:4px 10px;border-radius:8px;background:var(--ac2);color:var(--ac);font-size:12px;font-weight:800;letter-spacing:.04em;line-height:1.5;border:1px solid color-mix(in srgb,var(--ac) 20%,transparent)}
+.choice .module-code{margin-bottom:2px}
+.module-title{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}
+.choice-grid .choice{min-height:150px;justify-content:flex-start}
+.choice-grid .choice:focus-visible{outline:0;border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 25%,transparent)}
+.f>div{min-width:0}
+.card h3{margin-top:26px}
+.card .sub{line-height:1.55}
+@media(max-width:600px){.choice-grid .choice{min-height:0;padding:20px;}.module-code{font-size:11px}}
+.steps{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 auto 24px}
+.step{font-size:13px;font-weight:750;color:var(--mut);padding:8px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.step.active{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+.backline{display:flex;justify-content:flex-start;margin-bottom:16px}
+.site-footer{text-align:center;color:var(--mut);font-size:13px;padding:24px 12px 8px;font-weight:500;}.site-footer .heart{color:#f43f5e;font-size:17px;vertical-align:-1px}
+@media(max-width:600px){.welcome{margin-top:10px}.choice-grid{grid-template-columns:1fr}.steps{justify-content:flex-start}}
+
+.brand{display:flex;align-items:center;gap:14px;padding:4px 0 3px}
+.brand-mark{display:grid;place-items:center;flex:0 0 52px;width:52px;height:52px;border-radius:16px;background:linear-gradient(145deg,var(--ac),#a855f7);box-shadow:0 8px 24px rgba(0,0,0,0.2),inset 0 1px rgba(255,255,255,0.4);color:#fff}
+.brand-mark svg{width:28px;height:28px}
+.brand-copy{min-width:0}.brand-copy h1{font-size:clamp(24px,4.5vw,34px);letter-spacing:-.04em}
+.brand-copy p{margin:5px 0 0;color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;}
+.top .in{position:relative;z-index:1}nav{margin-top:22px;gap:6px}
+nav button{display:inline-flex;align-items:center;gap:8px;border-radius:12px 12px 0 0}
+@media(max-width:600px){.top{padding:20px 16px 0}.brand-mark{width:46px;height:46px;flex-basis:46px;border-radius:14px}.brand-copy p{font-size:13px}.wrap{padding-top:16px}nav{margin-top:18px;gap:4px}nav button{padding:12px 10px;font-size:13px;gap:6px}}
+@media(max-width:380px){nav button{padding:10px 8px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="in">
+ <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.5" width="16" height="19" rx="4"/><path d="M8 6.5h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg></span><div class="brand-copy"><h1>SLIIT CA Calculator</h1><p>Track your CA marks. Plan your final grade.</p></div></div>
+ <nav id="nav" aria-label="Main navigation"></nav>
+</div></div>
+<div class="wrap" id="app"></div>
+<script>
+const GB=[["A+",90,"4.00","90 - 100"],["A",80,"4.00","80 - 89"],["A-",75,"3.70","75 - 79"],["B+",70,"3.30","70 - 74"],["B",65,"3.00","65 - 69"],["B-",60,"2.70","60 - 64"],["C+",55,"2.30","55 - 59"],["C",45,"2.00","45 - 54"],["C-",40,"1.70","40 - 44"],["D+",35,"1.30","35 - 39"],["D",30,"1.00","30 - 34"],["E",0,"0.00","00 - 29"]];
+const P = [
+  ["IT1120","Introduction to Programming",1,1,[["Mid Exam",20],["Practical Test",20],["Lab Submission",10]]],
+  ["IT1140","Fundamentals of Computing",1,1,[["Group Project",20],["Mid-term Exam",20],["Lab Submission",10]]],
+  ["IT1130","Mathematics for Computing",1,1,[["Mid Exam",20],["Practical Test",10],["Lab Submissions",10]]],
+  ["IE1030","Data Communication and Networks",1,1,[["Mid Term Examination",20],["Lab Submission",10],["Network Design Project",20]],"The source lists “Continuous Assessments 50%” plus three components that already add up to 50%. It is treated as a summary row, not a separate input. Please verify with your module outline."],
+  ["IT1170","Data Structures and Algorithms",1,2,[["Lab Test",10],["Lab Submission",10],["Assignment",10],["Midterm Examination",20]]],
+  ["IT1160","Discrete Mathematics",1,2,[["Quiz 1",10],["Mid Test",20],["Quiz 2",10],["Lab Submission",10]]],
+  ["SE1020","Object Oriented Programming",1,2,[["Lab Test",10],["Assignment",10],["Mid Term",20],["Lab Submission",10]]],
+  ["IT1150","Technical Writing",1,2,[["Mid-term Exam",20],["Assignment 1",15],["Assignment 2",15]]],
+
+  ["IT2011","Artificial Intelligence and Machine Learning",2,1,[["Assignment",20],["Mid-term Exam",20],["Lab Submissions",10]]],
+  ["IT2140","Database Design and Development",2,1,[["Midterm Test",20],["Assignment",20],["Lab Submission",10]]],
+  ["IT2120","Probability and Statistics",2,1,[["Assignment",10],["Mid Term",20],["Lab Submission",10]]],
+  ["SE2030","Software Engineering",2,1,[["Quiz",10],["Group Assignment",10],["Mid Term Examination",20],["Lab Submission",10]]],
+  ["IE2102","Network Programming",2,2,[["Mid Examination",25],["Assignment",25]]],
+  ["IE2092","Introduction to Cyber Security",2,2,[["Midterm Examination",30],["Assignment",20]],"End Semester Assessment: 50%"],
+  ["IT2160","Professional Skills",2,2,[["Assignment – Case Study Presentation",30],["Individual Assignment – Personal Development Plan",10],["Mid Term Exam",20]],"Final Examination: 40%"],
+  ["IT2130","Operating Systems and System Administration",2,2,[["Mid Term Examination",20],["Lab Test",20],["Lab Submission",10]],"Final Examination: 50%"],
+
+  ["IT3120","Modern Enterprise Management",3,1,[["Workshop",20],["Quiz",10],["Midterm",20]],"Final Exam: 50%"],
+  ["IE3142","DevOps Security",3,1,[["Assignment",50]],"Examination: 50%"],
+  ["IE3122","Network Security",3,1,[["Mid Test",20],["Group Assignment",30]],"Final Exam: 50%"],
+  ["IE3132","Penetration Testing",3,1,[["Project Initiation",10],["Project Presentation + Quiz",40]],"Final Exam: 50%"]
+].map(a => ({
+  id: a[0],
+  code: a[0],
+  name: a[1],
+  y: a[2],
+  s: a[3],
+  items: a[4].map(x => ({ n: x[0], w: x[1] })),
+  note: a[5] || "",
+  pre: true
+}));
+
+const newDraft=()=>({id:"draft",code:"",name:"",y:1,s:1,items:[{n:"",w:"",m:""}]});
+let S={view:"home",faculty:"",year:1,sem:1,theme:"system",cur:"draft",marks:{},custom:[],draft:newDraft()};
+try{Object.assign(S,JSON.parse(localStorage.getItem("sliitCA2")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("sliitCA2",JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const f2=x=>(Math.round(x*100)/100).toFixed(2);
+const valid=v=>v!==""&&v!=null&&!isNaN(+v)&&+v>=0&&+v<=100;
+const W=i=>(+i.w>0?+i.w:0);
+
+const getMod=k=>k==="draft"?S.draft:(P.find(m=>m.id==k)||S.custom.find(m=>m.id==k));
+const items=m=>m.pre?m.items.map((it,i)=>({...it,m:(S.marks[m.id]||{})[i]??""})):m.items;
+const dashMods=()=>[...P,...S.custom.map(c=>({...c,pre:false}))].filter(m=>m.y==S.year&&m.s==S.sem);
+
+// Global click listener to close custom dropdown
+document.addEventListener('click', e => {
+  if(!e.target.closest('.dd-wrap')) {
+    const m = document.getElementById('dd-menu');
+    const t = document.getElementById('dd-trig');
+    if(m) m.classList.remove('open');
+    if(t) t.classList.remove('open');
+  }
+});
+
+function calc(m){
+ const its=items(m);let ent=0,con=0,caW=0,n=0;
+ its.forEach(i=>{const w=W(i);caW+=w;if(valid(i.m)){ent+=w;con+=+i.m*w/100;n++}});
+ return{its,ent,con,caW,n,over:caW>100.0001,fw:Math.max(0,100-caW),perf:ent>0?con/ent*100:null,status:n==0?"none":(n<its.length?"part":"full")};
+}
+function need(c,g){
+ if(!(c.fw>0))return{t:"No final exam",c:"b-none"};
+ const r=(g[1]-c.con)/c.fw*100;
+ if(r>100.0001)return{t:"Not Achievable",c:"b-bad"};
+ if(r<=0)return{t:"Achieved",c:"b-full"};
+ return{t:f2(r)+" / 100",r};
+}
+
+const badge=s=>`<span class="badge b-${s}">${{none:"No marks entered",part:"Partially completed",full:"All marks entered"}[s]}</span>`;
+function applyTheme(){const r=document.documentElement;S.theme==="system"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",S.theme)}
+function go(v,id){S.view=v;if(id)S.cur=id;save();render()}
+
+function chooseFaculty(f){S.faculty=f;S.view="year";save();render()}
+function chooseYear(y){S.year=y;S.view="semester";save();render()}
+function chooseSemester(n){S.sem=n;S.view="modules";save();render()}
+function backTo(v){S.view=v;save();render()}
+function startCustom(){S.draft=newDraft();S.draft.y=S.year;S.draft.s=S.sem;S.cur="draft";S.view="calc";save();render()}
+function wizardSteps(active){return `<div class="steps"><span class="step">1 · Faculty</span><span class="step ${active==='year'?'active':''}">2 · Year</span><span class="step ${active==='semester'?'active':''}">3 · Semester</span><span class="step ${active==='modules'?'active':''}">4 · Module</span></div>`}
+function vHome(){return `<section class="welcome"><h2>Welcome to your CA planner</h2><p class="intro">Choose your faculty to get started. You can add your own modules if your course is not listed.</p><div class="choice-grid"><button class="choice" onclick="chooseFaculty('computing')"><span class="symbol">⌘</span><strong>Faculty of Computing</strong><small>Browse the available Computing modules and assessment details.</small></button><button class="choice" onclick="chooseFaculty('other')"><span class="symbol">✦</span><strong>Other Faculties</strong><small>Create your own modules and assessment weights.</small></button></div></section>`}
+function vYear(){return `<section class="welcome">${wizardSteps('year')}<div class="backline"><button class="btn" onclick="backTo('home')">← Back</button></div><h2>Which year are you in?</h2><p class="intro">${S.faculty==='computing'?'Faculty of Computing':'Other Faculties'} · Select your academic year.</p><div class="choice-grid year-grid">${[1,2,3,4].map(y=>`<button class="choice" onclick="chooseYear(${y})"><span class="symbol">${y}</span><strong>Year ${y}</strong></button>`).join('')}</div></section>`}
+function vSemester(){return `<section class="welcome">${wizardSteps('semester')}<div class="backline"><button class="btn" onclick="backTo('year')">← Back</button></div><h2>Choose your semester</h2><p class="intro">Year ${S.year} · Select the semester you want to view.</p><div class="choice-grid">${[1,2].map(n=>`<button class="choice" onclick="chooseSemester(${n})"><span class="symbol">S${n}</span><strong>Semester ${n}</strong><small>Browse your semester modules</small></button>`).join('')}</div></section>`}
+function vModules(){const list=[...P,...S.custom].filter(m=>m.y==S.year&&m.s==S.sem);return `<section class="welcome">${wizardSteps('modules')}<div class="backline"><button class="btn" onclick="backTo('semester')">← Back</button></div><h2>Choose your module</h2><p class="intro">${S.faculty==='computing'?'Faculty of Computing':'Other Faculties'} · Year ${S.year}, Semester ${S.sem}</p><div class="choice-grid">${list.map(m=>`<button class="choice" onclick="go('calc','${m.id}')"><span class="module-title">${m.code?`<span class="module-code">${esc(m.code)}</span>`:""}<strong>${esc(m.name)}</strong></span><small>${m.items.length} assessment components</small></button>`).join('')}<button class="choice" onclick="startCustom()"><span class="symbol">＋</span><strong>Add a module</strong><small>Can't find your module? Create your own assessment list.</small></button></div>${list.length?'':'<p class="sub">No preset modules are listed for this semester yet. Add your module to continue.</p>'}</section>`}
+
+function buildDropdown(m) {
+  const title = S.cur === "draft" ? "＋ Add a new custom module..." : esc(m.code ? m.code + " - " + (m.name || "Untitled") : (m.name || "Untitled"));
+  let html = `<div class="dd-wrap">
+    <div class="dd-trig" id="dd-trig" onclick="document.getElementById('dd-menu').classList.toggle('open'); this.classList.toggle('open')">
+      <span>${title}</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
+    <div class="dd-menu" id="dd-menu">`;
+  
+  if(S.custom.length) {
+    html += `<div class="dd-group">My saved modules</div>`;
+    S.custom.forEach(x => {
+      const t = esc(x.code ? x.code + " - " + (x.name || "Untitled") : (x.name || "Untitled"));
+      html += `<div class="dd-opt ${S.cur==x.id?'sel':''}" onclick="S.cur='${x.id}';save();render()">${t}</div>`;
+    });
+  }
+  
+  [1,2].forEach(y => [1,2].forEach(s => {
+    const l = P.filter(p => p.y == y && p.s == s);
+    if(l.length) {
+      html += `<div class="dd-group">Year ${y} Semester ${s} (preset)</div>`;
+      l.forEach(x => {
+        const t = esc(x.code ? x.code + " - " + (x.name || "Untitled") : (x.name || "Untitled"));
+        html += `<div class="dd-opt ${S.cur==x.id?'sel':''}" onclick="S.cur='${x.id}';save();render()">${t}</div>`;
+      });
+    }
+  }));
+  
+  html += `<div class="dd-opt dd-add" onclick="startCustom()">＋ Add a new custom module...</div>
+    </div></div>`;
+  return html;
+}
+
+function vCalc(){
+ if(!getMod(S.cur))S.cur="draft";
+ const m=getMod(S.cur),ed=!m.pre,isDraft=m.id==="draft";
+ 
+ return`<div class="card"><label>Choose a module</label>
+ ${buildDropdown(m)}
+ <div class="sub" style="margin-top:12px">Enter a module name, its assessment weights and your marks. The final examination weight is calculated automatically.</div></div>
+ <div class="card">
+ ${ed?`<div class="f"><div style="grid-column:1/-1"><label>Module name</label><input type="text" value="${esc(m.name)}" placeholder="e.g. Web Technologies" oninput="meta('name',this.value)"></div>
+ <div><label>Academic year</label><select onchange="meta('y',+this.value)">${[1,2,3,4].map(y=>`<option value="${y}" ${m.y==y?"selected":""}>Year ${y}</option>`).join("")}</select></div>
+ <div><label>Semester</label><select onchange="meta('s',+this.value)">${[1,2].map(y=>`<option value="${y}" ${m.s==y?"selected":""}>Semester ${y}</option>`).join("")}</select></div></div>`
+ :`<div class="module-title"><h2>${esc(m.name)}</h2>${m.code?`<span class="module-code">${esc(m.code)}</span>`:""}</div><div class="sub" style="margin-top:6px">Year ${m.y}, Semester ${m.s}. Preset assessment weights cannot be edited.</div>${m.note?`<div class="alert a-warn">${esc(m.note)}</div>`:""}`}
+ <h3>Assessments</h3>
+ <div class="tw"><table><thead><tr><th>Assessment</th><th class="n">Weight (%)</th><th class="n">Obtained mark (/100)</th><th class="n">Contribution</th>${ed?"<th></th>":""}</tr></thead><tbody>
+ ${items(m).map((it,i)=>`<tr>
+ <td>${ed?`<input type="text" value="${esc(it.n)}" placeholder="e.g. Quiz 1" oninput="setIt(${i},'n',this)" onfocus="this.select()" aria-label="Assessment name">`:esc(it.n)}</td>
+ <td class="n">${ed?`<input type="number" inputmode="decimal" step="any" min="0" value="${esc(it.w)}" oninput="setIt(${i},'w',this)" onfocus="this.select()" aria-label="Weight">`:it.w+"%"}</td>
+ <td class="n"><input type="number" inputmode="decimal" step="any" min="0" max="100" value="${esc(it.m)}" placeholder="Not entered" oninput="setIt(${i},'m',this)" onfocus="this.select()" aria-label="Mark for ${esc(it.n)}"></td>
+ <td class="n" id="c${i}"></td>${ed?`<td><button class="btn dng" onclick="rmIt(${i})" aria-label="Remove assessment">Remove</button></td>`:""}</tr>`).join("")}
+ <tr class="fin"><td>Final Examination</td><td class="n" id="fw"></td><td class="n sub">Not entered</td><td class="n">–</td>${ed?"<td></td>":""}</tr></tbody></table></div>
+ <div class="acts">
+  ${ed?`<button class="btn" onclick="addIt()">＋ Add Assessment</button>`:""}
+  ${isDraft?`<button class="btn pri" onclick="saveDraft()">✓ Save Module</button>`:""}
+  <button class="btn dng" onclick="resetMod()">${isDraft?"Clear form":"Reset marks"}</button>
+  ${!m.pre&&!isDraft?`<button class="btn dng" onclick="delMod()">Delete module</button>`:""}
+  ${!isDraft ? `<button class="btn alt" onclick="startCustom()" style="margin-left:auto;">＋ New Module</button>` : ""}
+ </div>
+ <div id="err"></div>${!m.pre&&!isDraft?`<div class="sub" style="margin-top:10px">Saved module. Changes are stored automatically.</div>`:""}
+ </div><div class="card" id="res"></div>`;
+}
+function meta(k,v){getMod(S.cur)[k]=v;save()}
+function setIt(i,k,el){
+ const m=getMod(S.cur);
+ if(m.pre)(S.marks[m.id]=S.marks[m.id]||{})[i]=el.value;else m.items[i][k]=el.value;
+ if(k=="m")el.classList.toggle("bad",el.value!==""&&!valid(el.value));
+ if(k=="w")el.classList.toggle("bad",el.value!==""&&!(+el.value>0));
+ save();results(m);
+}
+function addIt(){getMod(S.cur).items.push({n:"",w:"",m:""});save();render()}
+function rmIt(i){const m=getMod(S.cur);m.items.splice(i,1);save();render()}
+function resetMod(){const m=getMod(S.cur);
+ if(!confirm(m.id==="draft"?"Clear everything in this form?":"Clear all marks for "+m.name+"?"))return;
+ if(m.pre)delete S.marks[m.id];else if(m.id==="draft")S.draft=newDraft();else m.items.forEach(i=>i.m="");
+ save();render()}
+function delMod(){const m=getMod(S.cur);if(!confirm('Delete saved module "'+m.name+'"? This cannot be undone.'))return;
+ S.custom=S.custom.filter(x=>x.id!=m.id);S.cur="draft";save();render()}
+function problems(m){
+ const e=[],seen=new Set();
+ m.items.forEach((it,i)=>{const n=(it.n||"").trim().toLowerCase();
+  if(!n)e.push(`Assessment ${i+1} needs a name.`);else if(seen.has(n))e.push(`Duplicate assessment name: ${esc(it.n)}.`);seen.add(n);
+  if(!(+it.w>0))e.push(`Assessment ${i+1} needs a positive weight.`);
+  if(it.m!==""&&!valid(it.m))e.push(`Assessment ${i+1} mark must be between 0 and 100.`)});
+ if(!m.items.length)e.push("Add at least one assessment.");
+ return e;
+}
+function saveDraft(){
+ const m=S.draft,e=problems(m),c=calc(m);
+ if(!m.name.trim())e.unshift("Enter a module name.");
+ if(c.over)e.push("Total CA weight cannot exceed 100%.");
+ if($("err"))$("err").innerHTML=e.map(x=>`<div class="alert a-bad">${x}</div>`).join("");
+ if(e.length)return;
+ const id="c"+Date.now();
+ S.custom.push({...JSON.parse(JSON.stringify(m)),id,name:m.name.trim()});
+ S.year=m.y;S.sem=m.s;S.draft=newDraft();S.cur=id;S.view="calc";save();render();
+}
+function results(m){
+ const c=calc(m);
+ c.its.forEach((it,i)=>{const e=$("c"+i);if(e)e.textContent=valid(it.m)&&W(it)?f2(it.m*W(it)/100):"–"});
+ $("fw").textContent=f2(c.fw)+"%";
+ let h="";
+ if(c.over)h+=`<div class="alert a-bad">Total CA weight is ${f2(c.caW)}%, which exceeds 100%. Reduce the assessment weights; the final examination weight cannot be negative.</div>`;
+ if(!m.pre){const e=problems(m);if(e.length&&m.items.some(i=>i.n||i.w!==""||i.m!==""))h+=`<div class="alert a-warn">${e.join("<br>")}</div>`}
+ h+=`<h2>CA summary</h2>`;
+ if(c.n==0)h+=`<div class="alert a-warn">Enter at least one mark to see results.</div>`;
+ else if(c.n<c.its.length)h+=`<div class="alert a-warn"><b>Provisional.</b> ${c.its.length-c.n} assessment(s) have no mark. They are not counted as zero in CA performance, but the predictions below assume no further CA marks.</div>`;
+ h+=`<div class="kp">
+ <div class="kpi"><b>${c.perf==null?"–":f2(c.perf)+" / 100"}</b><span>CA performance (completed assessments only)</span></div>
+ <div class="kpi"><b>${c.n?f2(c.con)+" / "+f2(c.caW):"–"}</b><span>CA contribution out of total CA weight</span></div></div>
+ <h3>Final examination marks required</h3><div class="tw"><table><thead><tr><th>Target grade</th><th class="n">Minimum overall mark</th><th class="n">Required final exam mark</th></tr></thead><tbody>
+ ${GB.slice(0,11).map(g=>{const r=need(c,g);return`<tr><td><b>${g[0]}</b></td><td class="n">${g[1]}</td><td class="n">${r.c?`<span class="badge ${r.c}">${r.t}</span>`:r.t}</td></tr>`}).join("")}</tbody></table></div>
+ <p class="sub" style="margin-top:14px">Required mark = (minimum overall mark − CA contribution) ÷ final examination weight × 100. Grade boundaries follow the official SLIIT marks range.</p>`;
+ $("res").innerHTML=h;
+}
+
+function vDash(){
+ const ms=dashMods(),cs=ms.map(calc),en=cs.filter(c=>c.n>0);
+ const avg=k=>en.length?en.reduce((a,c)=>a+c[k],0)/en.length:null;
+ const ap=avg("perf"),ac=avg("con"),aw=avg("caW");
+ return`<div class="sel"><select onchange="S.year=+this.value;save();render()" aria-label="Year">${[1,2,3,4].map(y=>`<option value="${y}" ${S.year==y?"selected":""}>Year ${y}</option>`).join("")}</select>
+ <select onchange="S.sem=+this.value;save();render()" aria-label="Semester">${[1,2].map(y=>`<option value="${y}" ${S.sem==y?"selected":""}>Semester ${y}</option>`).join("")}</select></div>
+ <div class="stats"><div class="card"><b>Year ${S.year}, Sem ${S.sem}</b><span class="sub">Selected period</span></div>
+ <div class="card"><b>${ms.length}</b><span class="sub">Total modules</span></div>
+ <div class="card"><b>${en.length}</b><span class="sub">Modules with marks entered</span></div>
+ <div class="card"><b>${ap==null?"–":f2(ap)+" / 100"}</b><span class="sub">Average CA performance</span></div>
+ <div class="card"><b>${ac==null?"–":f2(ac)+" / "+f2(aw)}</b><span class="sub">Average CA contribution (out of average CA weight)</span></div></div>
+ ${ms.length?`<div class="grid">${ms.map((m,i)=>{const c=cs[i];return`<div class="card mod s-${c.status}" tabindex="0" onclick="go('calc','${m.id}')" onkeydown="if(event.key==='Enter')go('calc','${m.id}')">
+ <div class="row"><span class="sub">Year ${m.y} · Semester ${m.s}</span>${badge(c.status)}</div><b style="font-size:17px;display:block;margin-top:4px">${esc(m.name)}</b>
+ <div class="row" style="margin-top:12px"><span class="sub">CA performance</span><b style="font-weight:700">${c.perf==null?"–":f2(c.perf)+" / 100"}</b></div>
+ <div class="row"><span class="sub">CA contribution</span><b style="font-weight:700">${c.n?f2(c.con)+" / "+f2(c.caW):"–"}</b></div>
+ <div class="bar"><i style="width:${c.its.length?c.n/c.its.length*100:0}%"></i></div>
+ <div class="sub">${c.n} of ${c.its.length} assessments entered</div>
+ <div class="acts"><button class="btn">View calculations</button></div></div>`}).join("")}</div>`
+ :`<div class="card empty">No modules added for this semester yet.<br><br><button class="btn pri" onclick="S.cur='draft';go('calc')">Add a custom module</button></div>`}`;
+}
+function vSettings(){
+ return`<div class="card"><h2>Settings</h2><label for="th">Theme</label>
+ <select id="th" style="max-width:240px" onchange="S.theme=this.value;save();applyTheme()">${["system","light","dark"].map(t=>`<option value="${t}" ${S.theme==t?"selected":""}>${t[0].toUpperCase()+t.slice(1)}</option>`).join("")}</select>
+ <h3 style="margin-top:32px">Saved data</h3><p class="sub">All data stays in this browser. No login is required.</p>
+ <button class="btn dng" onclick="if(confirm('Clear all marks and saved modules?')){const t=S.theme;S={view:'home',faculty:'',year:1,sem:1,theme:t,cur:'draft',marks:{},custom:[],draft:newDraft()};save();render()}">Clear all saved data</button></div>`;
+}
+
+// Reusable Grade Guide card
+function guideCardTemplate() {
+ return `<div class="card" style="margin-top:24px"><h2>Grade Guide</h2><div class="tw"><table><thead><tr><th>Grade</th><th class="n">Grade points</th><th class="n">Marks range</th></tr></thead><tbody>
+ ${GB.map(g=>`<tr><td><b style="font-size:16px">${g[0]}</b></td><td class="n">${g[2]}</td><td class="n">${g[3]}</td></tr>`).join("")}</tbody></table></div>
+ <p class="sub" style="margin-top:14px">Official SLIIT grading scale. The calculator uses the lowest mark in each range as the target overall mark. No separate minimum final examination mark is applied.</p></div>`;
+}
+
+function render(){
+ const wizard=["home","year","semester","modules"].includes(S.view);
+ // Removed "Grade Guide" from the header navigation arrays
+ $("nav").innerHTML=wizard?`<button class="on" onclick="backTo('home')">⌂ &nbsp; Get started</button><button onclick="go('dash')">▥ &nbsp; Dashboard</button><button onclick="go('settings')">⚙ &nbsp; Settings</button>`:[["calc","Calculator"],["dash","Dashboard"],["settings","Settings"]].map(t=>`<button class="${S.view==t[0]?"on":""}" onclick="go('${t[0]}')">${({calc:"▦",dash:"▥",settings:"⚙"}[t[0]])} &nbsp; ${t[1]}</button>`).join("");
+ 
+ const views={home:vHome,year:vYear,semester:vSemester,modules:vModules,calc:vCalc,dash:vDash,settings:vSettings};
+ 
+ // Appending the Grade Guide table ONLY at the bottom of the Calculator and Dashboard views
+ $("app").innerHTML=(views[S.view]||vHome)() + (['calc', 'dash'].includes(S.view) ? guideCardTemplate() : '') + `<footer class="site-footer">Made with <span class="heart">♥</span> by <strong>Tharu Pinsara</strong></footer>`;
+ 
+ if(S.view=="calc")results(getMod(S.cur));
+}
+if(!["home","year","semester","modules","calc","dash","settings"].includes(S.view))S.view="home";
+applyTheme();render();
+</script>
+</body>
+</html>
