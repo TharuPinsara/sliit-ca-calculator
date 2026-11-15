@@ -465,6 +465,56 @@ function guideCardTemplate() {
  <p class="sub" style="margin-top:14px">Official SLIIT grading scale. The calculator uses the lowest mark in each range as the target overall mark. No separate minimum final examination mark is applied.</p></div>`;
 }
 
+
+function seoContentTemplate() {
+  return `
+    <section class="card">
+      <h2>About SLIIT CA Calculator</h2>
+
+      <p>
+        SLIIT CA Calculator is a free online tool designed for
+        students of the Sri Lanka Institute of Information Technology
+        (SLIIT). It helps students calculate their Continuous
+        Assessment (CA) marks and plan their final examination
+        performance.
+      </p>
+
+      <h3>What can you calculate?</h3>
+      <ul>
+        <li>Continuous Assessment (CA) marks</li>
+        <li>Final examination marks required to achieve a target grade</li>
+        <li>Overall module marks and estimated grades</li>
+        <li>Academic performance across different modules</li>
+      </ul>
+
+      <h3>Who is this calculator for?</h3>
+      <p>
+        This calculator is designed for SLIIT students who want
+        to track their academic progress, understand their
+        assessment marks and prepare for final examinations.
+        Students can select their academic year, semester and
+        module to calculate their results.
+      </p>
+
+      <h3>How to use the SLIIT CA Calculator</h3>
+      <ol>
+        <li>Select your academic year and semester.</li>
+        <li>Choose the relevant module.</li>
+        <li>Enter your assessment marks.</li>
+        <li>View your calculated CA results.</li>
+        <li>Check the final examination mark required for your target grade.</li>
+      </ol>
+
+      <p class="sub">
+        This is an independent student project and is not an
+        official SLIIT website. Always verify assessment weights
+        and grading requirements against your module outline.
+      </p>
+    </section>
+  `;
+}
+
+ 
 function render(){
  const wizard=["home","year","semester","modules"].includes(S.view);
  // Removed "Grade Guide" from the header navigation arrays
@@ -473,7 +523,7 @@ function render(){
  const views={home:vHome,year:vYear,semester:vSemester,modules:vModules,calc:vCalc,dash:vDash,settings:vSettings};
  
  // Appending the Grade Guide table ONLY at the bottom of the Calculator and Dashboard views
- $("app").innerHTML=(views[S.view]||vHome)() + `<footer class="site-footer">Made with <span class="heart">♥</span> by <strong><a href="https://github.com/TharuPinsara" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">Tharu Pinsara</a></strong></footer>`;
+ $("app").innerHTML=(views[S.view]||vHome)() + (S.view === 'home' ? seoContentTemplate() : '') + `<footer class="site-footer">Made with <span class="heart">♥</span> by <strong><a href="https://github.com/TharuPinsara" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">Tharu Pinsara</a></strong></footer>`;
  
  if(S.view=="calc")results(getMod(S.cur));
 }
