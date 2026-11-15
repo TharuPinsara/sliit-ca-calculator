@@ -89,20 +89,11 @@ npx wrangler deploy
 
 Subsequent pushes to the production branch will trigger new deployments automatically.
 
-## Custom domain
-
-### Domain ownership note
-
-A subdomain must belong to a domain you control:
-
-- If you own **`tharu.site`**, the correct hostname is **`sliitca.tharu.site`**.
-- **`sliitca.tharu.shop`** belongs to **`tharu.shop`** and requires ownership of that domain as well.
-
 ### Adding the custom domain
 
 1. Open the Worker in the Cloudflare Dashboard.
 2. Go to **Settings** → **Domains & Routes** (or **Custom Domains**).
-3. Click **Add Custom Domain** and enter the hostname you control (e.g. `sliitca.tharu.site`).
+3. Click **Add Custom Domain** and enter the hostname you control.
 4. Complete any DNS / nameserver steps Cloudflare requests.
 5. Wait for the TLS certificate to be issued, then test the HTTPS URL.
 
