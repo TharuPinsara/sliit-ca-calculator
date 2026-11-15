@@ -1,4 +1,3 @@
-```markdown
 # SLIIT CA Calculator
 
 A lightweight, responsive web app that helps SLIIT students track continuous assessment (CA) marks and quickly see what final examination mark they need to reach a target grade.
@@ -128,6 +127,3 @@ All data (marks, custom modules, theme preference) is stored only in the user’
 ## License
 
 Add a license of your choice before allowing others to reuse or redistribute the project. If no license is present, do not assume the repository is free to reuse.
-```
-
-You can copy the whole block above into `README.md` in the repository root.
