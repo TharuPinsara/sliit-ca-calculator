@@ -124,9 +124,14 @@ select:focus { outline: 0; border-color: var(--ac); box-shadow: 0 0 0 4px color-
 .dd-add { color: var(--ac); font-weight: 700; position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); border-bottom: none; z-index: 2; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); }
 .dd-add:hover { background: color-mix(in srgb, var(--ac2) 50%, var(--card)); padding-left: 16px; }
 
+/* GPA Grid Layout */
+.gpa-row { display: grid; grid-template-columns: minmax(120px, 2fr) 90px 75px auto; gap: 12px; align-items: center; margin-bottom: 12px; }
+.gpa-header { font-size: 11px; font-weight: 800; color: var(--mut); text-transform: uppercase; letter-spacing: .055em; margin-bottom: 8px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+
+
 label{display:block;font-size:12px;font-weight:750;color:var(--mut);margin:0 0 8px;text-transform:uppercase;letter-spacing:.055em}
 .f{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));margin-bottom:8px}
-.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 16px;cursor:pointer;font-weight:700;transition:all .2s}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 16px;cursor:pointer;font-weight:700;transition:all .2s; display:inline-flex; align-items:center; justify-content:center;}
 .btn:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.05);}
 .btn:active{transform:translateY(0) scale(0.98);}
 .btn.pri{background:linear-gradient(135deg,var(--ac),#8b5cf6);border:none;color:#fff;box-shadow:0 4px 15px color-mix(in srgb,var(--ac) 40%,transparent)}
@@ -171,17 +176,125 @@ tr.fin td{background:color-mix(in srgb, var(--ac2) 60%, transparent);font-weight
   .top{padding:25px 16px 0}.wrap{padding:18px 13px 40px}.card{padding:16px;border-radius:16px}nav button{padding:10px 12px}.kp{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:16px}.kpi b{font-size:22px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.f{grid-template-columns:1fr 1fr}
   .wrap{min-width:0;overflow-x:hidden}
   .card{min-width:0;max-width:100%}
-  .tw{overflow-x:auto;overscroll-behavior-x:contain}
-  .tw table{min-width:0;width:100%;table-layout:fixed}
-  .tw th,.tw td{padding:10px 8px;font-size:13px;overflow-wrap:anywhere;word-break:normal}
-  .tw th{font-size:10px;letter-spacing:0;text-transform:none}
-  .tw td input,.tw td input[type=text],.tw td input[type=number]{width:100%;min-width:0;max-width:100%;padding:10px 8px;font-size:13px;border-radius:8px}
-  .tw td.n input{margin:0;max-width:100%}
-  .tw td.n,.tw th.n{text-align:center}
-  .tw td:last-child .btn{padding:8px;font-size:11px;white-space:normal}
   .acts{gap:7px}.acts .btn{flex:1 1 auto}
   .sel{gap:8px}.sel select{flex:1;min-width:0;width:0}
   select { padding: 10px 38px 10px 12px; }
+
+  /* Other tables: light scroll */
+  .tw:not(.tw-assess){overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .tw:not(.tw-assess) table{min-width:0;width:100%}
+  .tw:not(.tw-assess) th,.tw:not(.tw-assess) td{padding:10px 8px;font-size:13px}
+  .tw:not(.tw-assess) th{font-size:11px;letter-spacing:0}
+
+  /* Assessments as cards on mobile */
+  .tw-assess{border:none;overflow:visible;border-radius:0}
+  .tw-assess table{min-width:0;width:100%;border-collapse:separate;border-spacing:0 12px}
+  .tw-assess thead{display:none}
+  .tw-assess tbody tr{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 10px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.03);
+  }
+/* Fix blue background when typing on mobile */
+  .tw-assess tbody tr:hover td, .tw-assess tbody tr:active td { background: transparent !important; }
+
+  /* Assessment Name (force hide label) */
+  .tw-assess tbody td:nth-child(1) { grid-column:1 / -1; display:block; padding:0; border:none; font-weight:700; font-size:15px; }
+  .tw-assess tbody td:nth-child(1):before { display:none !important; content:none !important; }
+
+  /* Weight Column (Stacked by default) */
+  .tw-assess tbody td:nth-child(2) { grid-column:1; display:flex; flex-direction:column; align-items:flex-start; padding:0; border:none; }
+  .tw-assess tbody td:nth-child(2):before { content:"Weight (%)"; font-size:11px; font-weight:700; color:var(--mut); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; }
+
+  /* Mark Column (Stacked by default) */
+  .tw-assess tbody td:nth-child(3) { grid-column:2; display:flex; flex-direction:column; align-items:flex-start; padding:0; border:none; }
+  .tw-assess tbody td:nth-child(3):before { content:"Obtained (/100)"; font-size:11px; font-weight:700; color:var(--mut); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; }
+
+  /* IF PRESET (no input boxes): Show label and weight side-by-side */
+  .tw-assess tbody tr:not(:has(input)) td:nth-child(2),
+  .tw-assess tbody tr:not(:has(input)) td:nth-child(3) { flex-direction:row; align-items:center; gap:8px; }
+  .tw-assess tbody tr:not(:has(input)) td:nth-child(2):before,
+  .tw-assess tbody tr:not(:has(input)) td:nth-child(3):before { margin-bottom:0; }
+  /* Contribution – third line full width */
+  .tw-assess tbody td:nth-child(4){
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0 0;
+    border:none;
+    border-top:1px solid var(--line);
+    margin-top:4px;
+    font-size:14px;
+  }
+  .tw-assess tbody td:nth-child(4):before{
+    content:"Contribution";
+    font-size:12px;
+    font-weight:600;
+    color:var(--mut);
+  }
+  /* Remove button – full width */
+  .tw-assess tbody td:nth-child(5){
+    grid-column:1 / -1;
+    display:block;
+    padding:4px 0 0;
+    border:none;
+  }
+  .tw-assess tbody td:nth-child(5) .btn{
+    width:100%;
+    padding:10px 12px;
+    font-size:13px;
+  }
+  .tw-assess tbody td input,
+  .tw-assess tbody td input[type=text],
+  .tw-assess tbody td input[type=number]{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    padding:10px 12px;
+    font-size:14px;
+    border-radius:10px;
+    text-align:left;
+  }
+  .tw-assess tbody td.n input{text-align:right}
+
+  /* Final Examination row – simpler layout */
+  .tw-assess tbody tr.fin{
+    grid-template-columns:1fr auto;
+    background:color-mix(in srgb, var(--ac2) 45%, var(--card));
+    border-color:color-mix(in srgb, var(--ac) 20%, var(--line));
+    align-items:center;
+  }
+  .tw-assess tbody tr.fin td:nth-child(1){
+    grid-column:1;
+    font-weight:700;
+    font-size:15px;
+  }
+  .tw-assess tbody tr.fin td:nth-child(1):before{display:none}
+  .tw-assess tbody tr.fin td:nth-child(2){
+    grid-column:2;
+    font-weight:800;
+    font-size:16px;
+    color:var(--ac);
+    text-align:right;
+  }
+  .tw-assess tbody tr.fin td:nth-child(2):before{display:none}
+  .tw-assess tbody tr.fin td:nth-child(3),
+  .tw-assess tbody tr.fin td:nth-child(4),
+  .tw-assess tbody tr.fin td:nth-child(5){
+    display:none;
+  }
+
+  /* Mobile GPA overrides */
+  .gpa-row { grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .gpa-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .gpa-row .g-name { grid-column: 1 / -1; }
+  .gpa-header { display: none; }
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important;animation:none!important;}}
 
@@ -219,7 +332,9 @@ tr.fin td{background:color-mix(in srgb, var(--ac2) 60%, transparent);font-weight
 .brand-copy p{margin:5px 0 0;color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;}
 .top .in{position:relative;z-index:1}nav{margin-top:22px;gap:6px}
 nav button{display:inline-flex;align-items:center;gap:8px;border-radius:12px 12px 0 0}
-@media(max-width:600px){.top{padding:20px 16px 0}.brand-mark{width:46px;height:46px;flex-basis:46px;border-radius:14px}.brand-copy p{font-size:13px}.wrap{padding-top:16px}nav{margin-top:18px;gap:4px}nav button{padding:12px 10px;font-size:13px;gap:6px}}
+@media(max-width:600px){.top{padding:20px 16px 0}.brand-mark{width:46px;height:46px;flex-basis:46px;border-radius:14px}.brand-copy p{font-size:13px}.wrap{padding-top:16px}nav{margin-top:18px; gap:2px; overflow-x:hidden; justify-content:space-between;}
+nav button{padding:12px 0; font-size:11px; gap:4px; flex:1; justify-content:center;}
+.set-txt{display:none;}}
 @media(max-width:380px){nav button{padding:10px 8px;font-size:12px}}
 </style>
 </head>
@@ -265,9 +380,10 @@ const P = [
   pre: true
 }));
 
-const newDraft=()=>({id:"draft",code:"",name:"",y:1,s:1,items:[{n:"",w:"",m:""}]});
-let S={view:"home",faculty:"",year:1,sem:1,theme:"system",cur:"draft",marks:{},custom:[],draft:newDraft()};
+const newDraft=()=>({id:"draft",code:"",name:"",y:1,s:1,items:[{n:"",w:"",m:""}, {n:"",w:"",m:""}]});
+let S={view:"home",faculty:"",year:1,sem:1,theme:"system",cur:"draft",marks:{},custom:[],draft:newDraft(),gpaMods:[{name:"",credits:"",grade:"A"}, {name:"",credits:"",grade:"A"}]};
 try{Object.assign(S,JSON.parse(localStorage.getItem("sliitCA2")||"{}"))}catch(e){}
+if(!S.gpaMods || S.gpaMods.length === 0) S.gpaMods = [{name:"", credits:"", grade:"A"}, {name:"", credits:"", grade:"A"}];
 const save=()=>{try{localStorage.setItem("sliitCA2",JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -362,13 +478,13 @@ function vCalc(){
  <div><label>Semester</label><select onchange="meta('s',+this.value)">${[1,2].map(y=>`<option value="${y}" ${m.s==y?"selected":""}>Semester ${y}</option>`).join("")}</select></div></div>`
  :`<div class="module-title"><h2>${esc(m.name)}</h2>${m.code?`<span class="module-code">${esc(m.code)}</span>`:""}</div><div class="sub" style="margin-top:6px">Year ${m.y}, Semester ${m.s}. Preset assessment weights cannot be edited.</div>${m.note?`<div class="alert a-warn">${esc(m.note)}</div>`:""}`}
  <h3>Assessments</h3>
- <div class="tw"><table><thead><tr><th>Assessment</th><th class="n">Weight (%)</th><th class="n">Obtained mark (/100)</th><th class="n">Contribution</th>${ed?"<th></th>":""}</tr></thead><tbody>
+ <div class="tw tw-assess"><table><thead><tr><th>Assessment</th><th class="n">Weight (%)</th><th class="n">Obtained mark (/100)</th><th class="n">Contribution</th>${ed?"<th></th>":""}</tr></thead><tbody>
  ${items(m).map((it,i)=>`<tr>
- <td>${ed?`<input type="text" value="${esc(it.n)}" placeholder="e.g. Quiz 1" oninput="setIt(${i},'n',this)" onfocus="this.select()" aria-label="Assessment name">`:esc(it.n)}</td>
+ <td>${ed?`<input type="text" value="${esc(it.n)}" placeholder="e.g. Mid Exam / Quiz 1" oninput="setIt(${i},'n',this)" onfocus="this.select()" aria-label="Assessment name">`:esc(it.n)}</td>
  <td class="n">${ed?`<input type="number" inputmode="decimal" step="any" min="0" value="${esc(it.w)}" oninput="setIt(${i},'w',this)" onfocus="this.select()" aria-label="Weight">`:it.w+"%"}</td>
  <td class="n"><input type="number" inputmode="decimal" step="any" min="0" max="100" value="${esc(it.m)}" placeholder="Not entered" oninput="setIt(${i},'m',this)" onfocus="this.select()" aria-label="Mark for ${esc(it.n)}"></td>
  <td class="n" id="c${i}"></td>${ed?`<td><button class="btn dng" onclick="rmIt(${i})" aria-label="Remove assessment">Remove</button></td>`:""}</tr>`).join("")}
- <tr class="fin"><td>Final Examination</td><td class="n" id="fw"></td><td class="n sub">Not entered</td><td class="n">–</td>${ed?"<td></td>":""}</tr></tbody></table></div>
+ <tr class="fin"><td>Final Examination</td><td class="n" id="fw"></td><td class="n sub">Not yet finalized</td><td class="n">–</td>${ed?"<td></td>":""}</tr></tbody></table></div>
  <div class="acts">
   ${ed?`<button class="btn" onclick="addIt()">＋ Add Assessment</button>`:""}
   ${isDraft?`<button class="btn pri" onclick="saveDraft()">✓ Save Module</button>`:""}
@@ -427,7 +543,7 @@ function results(m){
  h+=`<div class="kp">
  <div class="kpi"><b>${c.perf==null?"–":f2(c.perf)+" / 100"}</b><span>CA performance (completed assessments only)</span></div>
  <div class="kpi"><b>${c.n?f2(c.con)+" / "+f2(c.caW):"–"}</b><span>CA contribution out of total CA weight</span></div></div>
- <h3>Final examination marks required</h3><div class="tw"><table><thead><tr><th>Target grade</th><th class="n">Minimum overall mark</th><th class="n">Required final exam mark</th></tr></thead><tbody>
+ <h3>Final examination marks required</h3><div class="tw"><table><thead><tr><th>Grade</th><th class="n">Min. overall</th><th class="n">Final exam needed</th></tr></thead><tbody>
  ${GB.slice(0,11).map(g=>{const r=need(c,g);return`<tr><td><b>${g[0]}</b></td><td class="n">${g[1]}</td><td class="n">${r.c?`<span class="badge ${r.c}">${r.t}</span>`:r.t}</td></tr>`}).join("")}</tbody></table></div>
  <p class="sub" style="margin-top:14px">Required mark = (minimum overall mark − CA contribution) ÷ final examination weight × 100. Grade boundaries follow the official SLIIT marks range.</p>`;
  $("res").innerHTML=h;
@@ -455,7 +571,116 @@ function vSettings(){
  return`<div class="card"><h2>Settings</h2><label for="th">Theme</label>
  <select id="th" style="max-width:240px" onchange="S.theme=this.value;save();applyTheme()">${["system","light","dark"].map(t=>`<option value="${t}" ${S.theme==t?"selected":""}>${t[0].toUpperCase()+t.slice(1)}</option>`).join("")}</select>
  <h3 style="margin-top:32px">Saved data</h3><p class="sub">All data stays in this browser. No login is required.</p>
- <button class="btn dng" onclick="if(confirm('Clear all marks and saved modules?')){const t=S.theme;S={view:'home',faculty:'',year:1,sem:1,theme:t,cur:'draft',marks:{},custom:[],draft:newDraft()};save();render()}">Clear all saved data</button></div>`;
+ <button class="btn dng" onclick="if(confirm('Clear all marks and saved modules?')){const t=S.theme;S={view:'home',faculty:'',year:1,sem:1,theme:t,cur:'draft',marks:{},custom:[],draft:newDraft(),gpaMods:[{name:'',credits:'',grade:'A'}, {name:'',credits:'',grade:'A'}]};save();render()}">Clear all saved data</button></div>`;
+}
+
+// GPA Calculator Logic
+function calcGpaResults() {
+  let totalCr = 0, totalPt = 0;
+  
+  // Failsafe: Ensure gpaMods exists and is an array
+  if (!Array.isArray(S.gpaMods)) {
+    S.gpaMods = [{name:"", credits:"", grade:"A"}, {name:"", credits:"", grade:"A"}];
+  }
+
+  S.gpaMods.forEach(m => {
+    let cr = parseFloat(m.credits);
+    if (!isNaN(cr) && cr > 0) {
+      // Failsafe: Default to "A" if no grade is selected yet
+      let gradeObj = GB.find(g => g[0] === (m.grade || "A")); 
+      let gp = gradeObj ? parseFloat(gradeObj[2]) : 0;
+      
+      totalCr += cr; 
+      totalPt += (cr * gp);
+    }
+  });
+  
+  let gpa = totalCr > 0 ? (totalPt / totalCr).toFixed(2) : "0.00";
+  let deansList = parseFloat(gpa) >= 3.7 
+    ? `<div class="alert a-ok" style="margin-top:16px;font-weight:800;text-align:center;font-size:16px;">🎉 Congratulations! You are on the Dean's List! 🎉</div>` 
+    : "";
+    
+  let resEl = document.getElementById("gpa-res");
+  if (resEl) {
+    resEl.innerHTML = `
+      <div class="card kp" style="margin-top: 0">
+        <div class="kpi"><b>${gpa}</b><span>Total GPA</span></div>
+        <div class="kpi"><b>${totalCr}</b><span>Total Credits</span></div>
+      </div>
+      ${deansList}
+    `;
+  }
+}
+
+function setGpaMod(i, k, v) { 
+  S.gpaMods[i][k] = v; 
+  save(); 
+  calcGpaResults(); // Update the numbers instantly without redrawing the whole screen
+}
+
+function addGpaMod() { 
+  if (!Array.isArray(S.gpaMods)) S.gpaMods = [];
+  S.gpaMods.push({name:"", credits:"", grade:"A"}); 
+  save(); 
+  render(); 
+}
+
+function rmGpaMod(i) { 
+  S.gpaMods.splice(i, 1); 
+  save(); 
+  render(); 
+}
+
+function resetGpa() { 
+  if(confirm("Clear all GPA modules?")) { 
+    S.gpaMods = [{name:"", credits:"", grade:"A"}, {name:"", credits:"", grade:"A"}];
+    save(); 
+    render(); 
+  } 
+}
+
+function vGpa() {
+  // Failsafe check for initial load
+  if (!Array.isArray(S.gpaMods) || S.gpaMods.length === 0) {
+    S.gpaMods = [{name:"", credits:"", grade:"A"}, {name:"", credits:"", grade:"A"}];
+  }
+
+  // Ensure calculations run immediately after the page draws
+  setTimeout(calcGpaResults, 0);
+
+  return `<div class="card">
+    <h2>GPA Calculator</h2>
+    <p class="sub" style="margin-bottom:20px">Add your modules, credits, and grades to calculate your total GPA.</p>
+    
+    <div class="gpa-list">
+      <div class="gpa-header gpa-row">
+        <div class="g-name">Module Name</div>
+        <div>Credits</div>
+        <div>Grade</div>
+        <div></div>
+      </div>
+      
+      ${S.gpaMods.map((m, i) => `
+      <div class="gpa-row">
+        <div class="g-name"><input type="text" value="${esc(m.name)}" placeholder="Module ${i+1}" oninput="setGpaMod(${i},'name',this.value)"></div>
+        <div><input type="number" min="0" step="any" value="${esc(m.credits)}" placeholder="Cr." oninput="setGpaMod(${i},'credits',this.value)"></div>
+        <div>
+          <select onchange="setGpaMod(${i},'grade',this.value)">
+            ${GB.map(g => `<option value="${g[0]}" ${m.grade===g[0]?"selected":""}>${g[0]}</option>`).join("")}
+          </select>
+        </div>
+        <div><button class="btn dng" style="padding:11px 16px; width:100%" onclick="rmGpaMod(${i})" aria-label="Remove module">✕</button></div>
+      </div>`).join("")}
+    </div>
+    
+    <div class="acts" style="margin-top:20px">
+      <button class="btn" onclick="addGpaMod()">＋ Add Module</button>
+      <button class="btn dng" onclick="resetGpa()">Reset Calculator</button>
+    </div>
+  </div>
+  <div id="gpa-res">
+    <!-- Results will inject here instantly -->
+  </div>`;
 }
 
 // Reusable Grade Guide card
@@ -517,17 +742,15 @@ function seoContentTemplate() {
  
 function render(){
  const wizard=["home","year","semester","modules"].includes(S.view);
- // Removed "Grade Guide" from the header navigation arrays
- $("nav").innerHTML=wizard?`<button class="on" onclick="backTo('home')">⌂ &nbsp; Get started</button><button onclick="go('dash')">▥ &nbsp; Dashboard</button><button onclick="go('settings')">⚙ &nbsp; Settings</button>`:[["calc","Calculator"],["dash","Dashboard"],["settings","Settings"]].map(t=>`<button class="${S.view==t[0]?"on":""}" onclick="go('${t[0]}')">${({calc:"▦",dash:"▥",settings:"⚙"}[t[0]])} &nbsp; ${t[1]}</button>`).join("");
+ $("nav").innerHTML=wizard?`<button class="on" onclick="backTo('home')">⌂ <span>Get started</span></button><button onclick="go('dash')">▥ <span>Dashboard</span></button><button onclick="go('gpa')">▥ <span>GPA Calculator</span></button><button onclick="go('settings')">⚙<span class="set-txt"> Settings</span></button>`:[["calc","Calculator"],["dash","Dashboard"],["gpa","GPA"],["settings","Settings"]].map(t=>`<button class="${S.view==t[0]?"on":""}" onclick="go('${t[0]}')">${({calc:"▦",dash:"▥",gpa:"▥",settings:"⚙"}[t[0]])} <span class="${t[0]==='settings'?'set-txt':''}">${t[1]}</span></button>`).join("");
+
+ const views={home:vHome,year:vYear,semester:vSemester,modules:vModules,calc:vCalc,dash:vDash,gpa:vGpa,settings:vSettings};
  
- const views={home:vHome,year:vYear,semester:vSemester,modules:vModules,calc:vCalc,dash:vDash,settings:vSettings};
- 
- // Appending the Grade Guide table ONLY at the bottom of the Calculator and Dashboard views
  $("app").innerHTML=(views[S.view]||vHome)() + (S.view === 'home' ? seoContentTemplate() : '') + `<footer class="site-footer">Made with <span class="heart">♥</span> by <strong><a href="https://github.com/TharuPinsara" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">Tharu Pinsara</a></strong></footer>`;
  
  if(S.view=="calc")results(getMod(S.cur));
 }
-if(!["home","year","semester","modules","calc","dash","settings"].includes(S.view))S.view="home";
+if(!["home","year","semester","modules","calc","dash","gpa","settings"].includes(S.view))S.view="home";
 applyTheme();render();
 </script>
 </body>
