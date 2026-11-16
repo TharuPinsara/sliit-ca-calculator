@@ -1,59 +1,61 @@
-# SLIIT CA Calculator
+# 🎓 SLIIT CA & GPA Calculator
 
-A lightweight, responsive web app that helps SLIIT students track continuous assessment (CA) marks and quickly see what final examination mark they need to reach a target grade.
+A lightweight, responsive web app designed for SLIIT undergraduates. Track your Continuous Assessment (CA) marks, find out exactly what you need on the final exam to reach your target grade, and calculate your overall GPA - all in one place.
 
-**Live site:** [sliitca.tharu.site](https://sliitca.tharu.site)
+🌐 **Live site:** [sliitca.tharu.site](https://sliitca.tharu.site)
 
-> **Important:** Always verify assessment weights and grading rules against the latest official module outline / SLIIT handbook. Module structures can change between academic years.
+> **💡 Important Note:** Always verify assessment weights and grading rules against your latest official module outline or the SLIIT student handbook, as module structures can change between academic years.
 
-## Features
+---
 
-- **Preset modules** – Computing modules organised by academic year and semester with realistic assessment breakdowns
-- **Custom modules** – Create your own modules with any number of assessment components
-- **Smart calculations**
-  - Enter obtained marks for each CA component
-  - Automatic calculation of remaining final-exam weight
-  - Instantly see the final mark required for every grade (A+, A, A-, …)
-- **Dashboard** – Overview of all modules you have entered marks for
-- **Local persistence** – Theme preference and entered marks are saved in the browser (localStorage)
-- **Theme support** – Light / Dark / System
-- **Fully responsive** – Works well on desktop, tablet and mobile
+## ✨ Features
 
-## Tech stack
+- **Smart CA Calculations** - Enter the marks you've obtained for each CA component. The app automatically calculates your remaining final-exam weight and shows the exact final exam mark needed to secure every possible grade boundary.
+- **Preset Modules** - Jump right in with pre-configured computing modules sorted by academic year and semester, featuring accurate assessment breakdowns.
+- **Custom Modules** - Taking a module that isn't on the list? Create your own custom modules with any number of assessment components and custom weights.
+- **GPA Calculator** - Calculate your semester or overall GPA in seconds. Enter module names, credits, and grades (A+, A, A-, etc.) to instantly see your Total GPA and Credits.
+- **Dashboard Overview** - Get a clear view of all your ongoing modules, current CA performance, and completion status in one clean interface.
+- **Privacy-First & Offline Ready** - No accounts, no logins, and no databases. Everything (including theme preferences and entered marks) is saved securely in your browser's local storage.
+- **Themes** - Choose between Light, Dark, or System themes.
+- **Fully Responsive** - Optimized for desktop, tablet, and mobile devices.
 
-- HTML, CSS, Vanilla JavaScript
-- Hosted on **Cloudflare Workers Static Assets**
+---
 
-No backend or database is required. Everything runs client-side.
+## 💻 Tech Stack
 
-## Project structure
+- **Frontend:** HTML, CSS, Vanilla JavaScript
+- Everything runs on the client-side.
+
+---
+
+## 📂 Project Structure
 
 ```text
 sliit-ca-calculator/
 ├── public/
-│   └── index.html          # The entire application
-├── wrangler.jsonc
+│   └── index.html          
+├── wrangler.jsonc         
 ├── README.md
 └── .gitignore
 ```
 
-## Run locally
+## 🚀 Run Locally
 
-1. Clone the repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/TharuPinsara/sliit-ca-calculator.git
 cd sliit-ca-calculator
 ```
 
-2. Open `public/index.html` in a browser  
-   **or** use a local static server (e.g. VS Code Live Server, `npx serve public`, etc.).
+Open `public/index.html` in your favorite browser.  
+(Alternatively, use a local static server like VS Code Live Server or `npx serve public` for hot-reloading).
 
-## Deploy to Cloudflare Workers
+## ☁️ Deploy to Cloudflare Workers
 
-### 1. `wrangler.jsonc`
+### 1. Configure `wrangler.jsonc`
 
-```jsonc
+```json
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "sliit-ca-calculator",
@@ -64,9 +66,9 @@ cd sliit-ca-calculator
 }
 ```
 
-Update the `compatibility_date` if you deploy later.
+(Update the `compatibility_date` to today's date if you are deploying later).
 
-### 2. Deploy from your machine (optional)
+### 2. Deploy from your machine (Optional)
 
 ```bash
 npm install -D wrangler
@@ -74,47 +76,44 @@ npx wrangler login
 npx wrangler deploy
 ```
 
-### 3. Automatic deployments via GitHub
+### 3. Automatic Deployments via GitHub (Recommended)
 
-1. Push the repo to GitHub.
-2. In the Cloudflare Dashboard → **Workers & Pages** → **Create application**.
-3. Connect the GitHub repository.
-4. Configure:
-   - Worker name: `sliit-ca-calculator`
-   - Production branch: `main`
-   - Root directory: `/`
-   - Build command: *(leave empty)*
-   - Deploy command: `npx wrangler deploy`
-5. Deploy.
+1. Push your local repository to GitHub.
+2. Go to your Cloudflare Dashboard - Workers & Pages - Create application.
+3. Connect your GitHub account and select this repository.
+4. Configure the build settings:
+   - **Worker name:** `sliit-ca-calculator`
+   - **Production branch:** `main`
+   - **Root directory:** `/`
+   - **Build command:** (leave empty)
+   - **Deploy command:** `npx wrangler deploy`
+5. Click Deploy. Subsequent pushes to your `main` branch will now trigger new deployments automatically.
 
-Subsequent pushes to the production branch will trigger new deployments automatically.
+### 4. Adding a Custom Domain
 
-### Adding the custom domain
-
-1. Open the Worker in the Cloudflare Dashboard.
-2. Go to **Settings** → **Domains & Routes** (or **Custom Domains**).
-3. Click **Add Custom Domain** and enter the hostname you control.
+1. Open your newly deployed Worker in the Cloudflare Dashboard.
+2. Navigate to Settings - Domains & Routes (or Custom Domains).
+3. Click Add Custom Domain and enter your personal domain.
 4. Complete any DNS / nameserver steps Cloudflare requests.
-5. Wait for the TLS certificate to be issued, then test the HTTPS URL.
+5. Wait a few minutes for the TLS certificate to issue, and your site is live.
 
-## Updating the app
+## 🔄 Updating the App
 
-1. Edit `public/index.html`.
-2. Test locally.
-3. Commit and push:
+Making changes is easy since the entire app lives in one file:
+
+1. Edit the code in `public/index.html`.
+2. Test your changes locally.
+3. Commit and push to GitHub:
 
 ```bash
 git add .
-git commit -m "Update CA calculator"
+git commit -m "Update CA calculator layout"
 git push
 ```
 
-Cloudflare will redeploy automatically if Git integration is enabled.
+(Cloudflare will automatically catch the push and redeploy your site in seconds).
 
-## Data & privacy
+## 🔒 Data & Privacy
 
-All data (marks, custom modules, theme preference) is stored only in the user’s browser via `localStorage`. Nothing is sent to any server.
+We respect your data. All data - including your CA marks, custom modules, GPA inputs, and theme preferences - is stored only in your browser via `localStorage`. Absolutely nothing is tracked or sent to any external servers.
 
-## License
-
-Add a license of your choice before allowing others to reuse or redistribute the project. If no license is present, do not assume the repository is free to reuse.
